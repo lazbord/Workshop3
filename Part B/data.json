@@ -1,0 +1,66 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "Laptop",
+      "description": "Powerful laptop for all your needs",
+      "price": 999.99,
+      "category": "Electronics",
+      "inStock": true
+    },
+    {
+      "id": "2",
+      "name": "Headphones",
+      "description": "High-quality over-ear headphones",
+      "price": 149.99,
+      "category": "Electronics",
+      "inStock": false
+    },
+    {
+      "id": "3",
+      "name": "Coffee Maker",
+      "description": "Automatic coffee maker for your morning brew",
+      "price": 49.99,
+      "category": "Appliances",
+      "inStock": true
+    }
+  ],
+  "orders": [
+    {
+      "orderId": "1",
+      "userId": "user123",
+      "products": [
+        { "product": { "id": "1", "name": "Laptop", "price": 999.99 }, "quantity": 2 },
+        { "product": { "id": "3", "name": "Coffee Maker", "price": 49.99 }, "quantity": 1 }
+      ],
+      "total": 2049.97,
+      "status": "Shipped"
+    },
+    {
+      "orderId": "2",
+      "userId": "user456",
+      "products": [
+        { "product": { "id": "2", "name": "Headphones", "price": 149.99 }, "quantity": 1 }
+      ],
+      "total": 149.99,
+      "status": "Pending"
+    }
+  ],
+  "carts": [
+    {
+      "userId": "user123",
+      "items": [
+        { "productId": "1", "quantity": 1 },
+        { "productId": "2", "quantity": 3 }
+      ],
+      "total": 1349.95
+    },
+    {
+      "userId": "user789",
+      "items": [
+        { "productId": "3", "quantity": 2 }
+      ],
+      "total": 99.98
+    }
+  ]
+}
