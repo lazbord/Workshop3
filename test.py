@@ -1,67 +1,44 @@
 from sklearn.cluster import KMeans
-from sklearn.metrics import accuracy_score
-from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split
-from sklearn import datasets
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
+from flask import Flask, jsonify
 import numpy as np
 
 # Load Iris dataset
+from sklearn import datasets
+
 iris = datasets.load_iris()
 X = iris.data
-y = iris.target
 
-# Encode target labels (optional)
-le = LabelEncoder()
-y_encoded = le.fit_transform(y)
-
-# Split the dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
-
-# Apply k-means clustering
+# Fit KMeans model
 kmeans = KMeans(n_clusters=3, random_state=42)
-kmeans.fit(X_train)
+kmeans.fit(X)
 
-# Predict the clusters for the test set
-y_pred = kmeans.predict(X_test)
+# Map numerical labels to custom cluster names
+cluster_names = {0: 'setosa', 1: 'versicolor', 2: 'virginica'}
 
-# Map cluster labels to original class labels
-cluster_to_class_mapping = {cluster: np.argmax(np.bincount(y_train[kmeans.labels_ == cluster])) for cluster in range(3)}
-y_pred_mapped = np.array([cluster_to_class_mapping[cluster] for cluster in y_pred])
+# Create a Flask application
+app = Flask(__name__)
 
-# Evaluate accuracy
-accuracy = accuracy_score(y_test, y_pred_mapped)
-print(f'Accuracy: {accuracy * 100:.2f}%')
 
-# Apply PCA for visualization (reduce data to 2D)
-pca = PCA(n_components=2)
-X_pca = pca.fit_transform(X)
+# Define the predict route
+@app.route('/predict/<float:sepal_length>/<float:sepal_width>/<float:petal_length>/<float:petal_width>',
+           methods=['GET'])
+def predict(sepal_length, sepal_width, petal_length, petal_width):
+    # Make a prediction
+    input_data = np.array([[sepal_length, sepal_width, petal_length, petal_width]])
+    cluster = kmeans.predict(input_data)[0]
 
-# Apply k-means clustering on the 2D data
-kmeans_2d = KMeans(n_clusters=3, random_state=42)
-kmeans_2d.fit(X_pca)
+    # Create a response with custom cluster names
+    probabilities = {cluster_names[i]: 0.0 for i in range(kmeans.n_clusters)}
+    probabilities[cluster_names[cluster]] = 1.0
 
-# Predict the clusters for the original data
-y_pred_2d = kmeans_2d.predict(X_pca)
+    response = {
+        'prediction': cluster_names[cluster],
+        'probabilities': probabilities
+    }
 
-# Plot the clusters
-plt.figure(figsize=(12, 6))
+    # Return the prediction as JSON
+    return jsonify(response)
 
-# Plot the actual class labels
-plt.subplot(1, 2, 1)
-plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y, cmap='viridis', edgecolor='k', s=50)
-plt.title('Actual Class Labels')
-plt.xlabel('Principal Component 1')
-plt.ylabel('Principal Component 2')
 
-# Plot the k-means clustering results
-plt.subplot(1, 2, 2)
-plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y_pred_2d, cmap='viridis', edgecolor='k', s=50)
-plt.scatter(kmeans_2d.cluster_centers_[:, 0], kmeans_2d.cluster_centers_[:, 1], marker='X', s=200, c='red', label='Centroids')
-plt.title('K-Means Clustering Results')
-plt.xlabel('Principal Component 1')
-plt.ylabel('Principal Component 2')
-plt.legend()
-
-plt.show()
+if __name__ == '__main__':
+    app.run(debug=True)
