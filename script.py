@@ -45,15 +45,22 @@ print(class_report)
 from flask import Flask, request, jsonify
 app = Flask(__name__)
 
-@app.route('/predict/<float:sepal_length>/<float:sepal_width>/<float:petal_length>/<float:petal_width>', methods=['GET'])
+
+@app.route('/predict/<float:sepal_length>/<float:sepal_width>/<float:petal_length>/<float:petal_width>',
+           methods=['GET'])
 def predict(sepal_length, sepal_width, petal_length, petal_width):
     # Make a prediction
     input_data = np.array([[sepal_length, sepal_width, petal_length, petal_width]])
     prediction = rf_classifier.predict(input_data)[0]
+    class_name = iris.target_names[prediction]
     probabilities = rf_classifier.predict_proba(input_data)
+
+    # Convert class names to strings for better JSON representation
+    class_names_str = [str(class_name) for class_name in iris.target_names]
+
     response = {
-        'prediction': int(prediction),
-        'probabilities': {str(class_label): proba for class_label, proba in enumerate(probabilities[0])}
+        'prediction': class_name,
+        'probabilities': {class_names_str[i]: proba for i, proba in enumerate(probabilities[0])}
     }
     # Return the prediction as JSON
     return jsonify(response)
