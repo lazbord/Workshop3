@@ -1,4 +1,5 @@
 # Import necessary libraries
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
@@ -40,3 +41,24 @@ print("\nConfusion Matrix:")
 print(conf_matrix)
 print("\nClassification Report:")
 print(class_report)
+
+from flask import Flask, request, jsonify
+app = Flask(__name__)
+
+@app.route('/predict/<float:sepal_length>/<float:sepal_width>/<float:petal_length>/<float:petal_width>', methods=['GET'])
+def predict(sepal_length, sepal_width, petal_length, petal_width):
+    # Make a prediction
+    input_data = np.array([[sepal_length, sepal_width, petal_length, petal_width]])
+    prediction = rf_classifier.predict(input_data)[0]
+    probabilities = rf_classifier.predict_proba(input_data)
+    response = {
+        'prediction': int(prediction),
+        'probabilities': {str(class_label): proba for class_label, proba in enumerate(probabilities[0])}
+    }
+    # Return the prediction as JSON
+    return jsonify(response)
+
+
+if __name__ == '__main__':
+    # Run the Flask app
+    app.run(debug=True)
