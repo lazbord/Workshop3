@@ -10,6 +10,7 @@ const port = 3001;
 connectDb();
 createTables().then(r => {
 });
+
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello, World!');
 });
@@ -38,27 +39,33 @@ app.get('/products', async (req, res) => {
 
 app.post('/products', async (req, res) => {
     try {
+        console.log('Received POST request with body:', req.body);
+
         // Create a new product with the provided data
         const newProduct = await Product.create(req.body);
+        console.log('New product created:', newProduct);
+
         // Respond with the newly created product
-        res.json(newProduct);
+        res.status(201).json(newProduct);
     } catch (error) {
-        console.error(error);
+        console.error('Error occurred while processing POST request:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
-app.get('/products/:id', async (req, res) => {
+
+app.get('/products/:id', async (req, res) =>{
     try {
-        // Retrieve the product with the specified ID from the database
+        // Retrieve the product with the specified id
         const product = await Product.findByPk(req.params.id);
-        // If the product doesn't exist, respond with an error
-        if (!product) {
-            res.status(404).json({ error: 'Product not found' });
-            return;
+        // If the product is found, respond with the product
+        if(product){
+            res.json(product);
         }
-        // Respond with the product
-        res.json(product);
+        // If the product is not found, respond with a 404 status code
+        else{
+            res.status(404).json({ error: 'Product not found' });
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -66,4 +73,45 @@ app.get('/products/:id', async (req, res) => {
 });
 
 
+app.put('/products/:id', async (req, res) =>
+{
+    try {
+        console.log('Received PUT request with body:', req.body);
 
+        // Retrieve the product with the specified id
+        const product = await Product.findByPk(req.params.id);
+        // If the product is found, update it with the provided data
+        if(product){
+            await product.update(req.body);
+            console.log('Product updated:', product);
+            res.json(product);
+        }
+        // If the product is not found, respond with a 404 status code
+        else{
+            res.status(404).json({ error: 'Product not found' });
+        }
+    } catch (error) {
+        console.error('Error occurred while processing PUT request:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.delete('/products/:id', async (req, res) => {
+    try {
+        // Retrieve the product with the specified id
+        const product = await Product.findByPk(req.params.id);
+        // If the product is found, delete it
+        if(product){
+            await product.destroy();
+            console.log('Product deleted:', product);
+            res.json({ message: 'Product deleted' });
+        }
+        // If the product is not found, respond with a 404 status code
+        else{
+            res.status(404).json({ error: 'Product not found' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
