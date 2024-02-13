@@ -32,6 +32,7 @@ export class Cart extends Model{
         quantity: number;
     }>;
     declare totalPrice:number;
+    declare userid:number;
 }
 
 export function connectDb(): void {
@@ -97,6 +98,11 @@ export async function createTables() {
 
 
     Cart.init({
+        userId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true,
+        },
         totalPrice: {
             type: DataTypes.DECIMAL(10, 2),
             allowNull: false,
