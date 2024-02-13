@@ -28,11 +28,11 @@ export class Order extends Model {
 
 export class Cart extends Model{
     declare products: Array<{
-        product: Product;
+        productId: number;
         quantity: number;
     }>;
     declare totalPrice:number;
-    declare userid:number;
+    declare userId:number;
 }
 
 export function connectDb(): void {
@@ -111,6 +111,13 @@ export async function createTables() {
         products: {
             type: DataTypes.ARRAY(DataTypes.JSONB),
             defaultValue: [],
+            field: 'products',
+            get() {
+                return this.getDataValue('products');
+            },
+            set(val: Array<{ productId: number; quantity: number }>) {
+                this.setDataValue('products', val.map(item => ({ productId: item.productId, quantity: item.quantity })));
+            },
         },
     }, { sequelize, tableName: "Cart" });
 
