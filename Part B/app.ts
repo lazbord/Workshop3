@@ -187,3 +187,48 @@ app.get('/cart/:userId', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+app.delete('/cart/:userId/item/:productId', async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const productId: number =+ req.params.productId;
+
+        // Find the cart for the given userId
+        let cart = await Cart.findOne({ where: { userId } });
+
+        // If the cart doesn't exist, respond with a 404 status code
+        if (!cart) {
+            return res.status(404).json({ error: 'Cart not found' });
+        }
+
+        // Find the index of the product in the cart's products array
+        const productIndex = cart.products.findIndex(item => item.productId === productId);
+
+        // If the product is not found in the cart, respond with a 404 status code
+        if (productIndex === -1) {
+            return res.status(404).json({ error: 'Product not found in cart' });
+        }
+
+        // Remove the product from the cart's products array
+        cart.products.splice(productIndex, 1);
+        // Tell Sequelize that the 'products' field has changed
+        cart.changed('products', true);
+
+        // Recalculate the total price of the cart
+        let totalPrice = 0;
+        for (const item of cart.products) {
+            const product = await Product.findByPk(item.productId);
+            totalPrice += product.price * item.quantity;
+        }
+        cart.totalPrice = totalPrice;
+
+        // Save the updated cart
+        await cart.save();
+
+        // Return the updated cart as the response
+        res.json(cart);
+    } catch (error) {
+        console.error('Error occurred while processing DELETE request:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
