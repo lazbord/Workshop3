@@ -1,0 +1,24 @@
+<!-- Button for GET request -->
+<button (click)="getProducts()">Get Products</button>
+
+<!-- Text entries and button for POST request -->
+<input [(ngModel)]="newProduct.name" placeholder="Product Name">
+<input [(ngModel)]="newProduct.description" placeholder="Product Description">
+<input [(ngModel)]="newProduct.price" placeholder="Product Price" type="number">
+<button (click)="createProduct(newProduct)">Create Product</button>
+
+<!-- Text entries and button for PUT request -->
+<input [(ngModel)]="updatedProduct.id" placeholder="Product ID">
+<input [(ngModel)]="updatedProduct.name" placeholder="Updated Product Name">
+<input [(ngModel)]="updatedProduct.description" placeholder="Updated Product Description">
+<input [(ngModel)]="updatedProduct.price" placeholder="Updated Product Price" type="number">
+<button (click)="updateProduct(updatedProduct)">Update Product</button>
+
+<!-- Text entry and button for DELETE request -->
+<input [(ngModel)]="productIdToDelete" placeholder="Product ID">
+<button (click)="deleteProduct(productIdToDelete)">Delete Product</button>
+
+<!-- List of products -->
+<div *ngFor="let product of products">
+  <p>{{ product.name }}: {{ product.description }} - {{ product.price }}</p>
+</div>
