@@ -1,7 +1,7 @@
 // server.ts
 import * as express from 'express';
 import {Request, Response} from 'express';
-import {Cart, connectDb, createTables, Product} from './DBManager';
+import {Cart, connectDb, createTables, Order, Product} from './DBManager';
 const app = express();
 app.use(express.json());
 
@@ -229,6 +229,48 @@ app.delete('/cart/:userId/item/:productId', async (req, res) => {
         res.json(cart);
     } catch (error) {
         console.error('Error occurred while processing DELETE request:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+// Orders
+app.post('/order/:userId', async (req: Request, res: Response) => {
+    try {
+        const userId = req.params.userId;
+
+        let cart = await Cart.findOne({ where: { userId } });
+
+        if (!cart) {
+            return res.status(404).json({ error: 'Cart not found' });
+        }
+
+        const order = await Order.create({
+            userId,
+            products: cart.products,
+            totalPrice: cart.totalPrice,
+        });
+
+        // Delete the cart
+        await cart.destroy();
+
+        res.json(order);
+    } catch (error) {
+        console.error('Error occurred while processing POST request:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+app.get('/order/:userId', async (req: Request, res: Response) => {
+    try {
+        const userId = req.params.userId;
+
+        const orders = await Order.findAll({ where: { userId } });
+
+        res.json(orders);
+    } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
