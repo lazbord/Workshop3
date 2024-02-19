@@ -2,7 +2,7 @@
 import * as express from 'express';
 import * as cors from 'cors';
 import {Request, Response} from 'express';
-import {Cart, connectDb, createTables, Order, Product} from './DBManager';
+import {Cart, connectDb, createTables, Order, Product, User} from './DBManager';
 
 const app = express();
 app.use(cors({
@@ -121,18 +121,18 @@ app.delete('/products/:id', async (req, res) => {
     }
 });
 
-app.post('/cart/:userId', async (req, res) => {
+app.post('/cart/:UserId', async (req, res) => {
     try {
-        const userId = req.params.userId;
+        const UserId = req.params.UserId;
         const { productId, quantity } = req.body;
 
-        // Find the cart for the given userId
-        let cart = await Cart.findOne({ where: { userId } });
+        // Find the cart for the given UserId
+        let cart = await Cart.findOne({ where: { UserId } });
 
         // If the cart doesn't exist, create a new one
         if (!cart) {
             console.log("New cart")
-            cart = await Cart.create({ userId, products: [], totalPrice: 0 });
+            cart = await Cart.create({ UserId, products: [], totalPrice: 0 });
         }
 
         // Find the product for the given productId
@@ -173,12 +173,12 @@ app.post('/cart/:userId', async (req, res) => {
     }
 });
 
-app.get('/cart/:userId', async (req, res) => {
+app.get('/cart/:UserId', async (req, res) => {
     try {
-        const userId = req.params.userId;
+        const UserId = req.params.UserId;
 
-        // Find the cart for the given userId
-        let cart = await Cart.findOne({ where: { userId } });
+        // Find the cart for the given UserId
+        let cart = await Cart.findOne({ where: { UserId } });
 
         // If the cart doesn't exist, respond with a 404 status code
         if (!cart) {
@@ -193,13 +193,13 @@ app.get('/cart/:userId', async (req, res) => {
     }
 });
 
-app.delete('/cart/:userId/item/:productId', async (req, res) => {
+app.delete('/cart/:UserId/item/:productId', async (req, res) => {
     try {
-        const userId = req.params.userId;
+        const UserId = req.params.UserId;
         const productId: number =+ req.params.productId;
 
-        // Find the cart for the given userId
-        let cart = await Cart.findOne({ where: { userId } });
+        // Find the cart for the given UserId
+        let cart = await Cart.findOne({ where: { UserId } });
 
         // If the cart doesn't exist, respond with a 404 status code
         if (!cart) {
@@ -240,18 +240,18 @@ app.delete('/cart/:userId/item/:productId', async (req, res) => {
 
 
 // Orders
-app.post('/order/:userId', async (req: Request, res: Response) => {
+app.post('/order/:UserId', async (req: Request, res: Response) => {
     try {
-        const userId = req.params.userId;
+        const UserId = req.params.UserId;
 
-        let cart = await Cart.findOne({ where: { userId } });
+        let cart = await Cart.findOne({ where: { UserId } });
 
         if (!cart) {
             return res.status(404).json({ error: 'Cart not found' });
         }
 
         const order = await Order.create({
-            userId,
+            UserId,
             products: cart.products,
             totalPrice: cart.totalPrice,
         });
@@ -267,13 +267,36 @@ app.post('/order/:userId', async (req: Request, res: Response) => {
 });
 
 
-app.get('/order/:userId', async (req: Request, res: Response) => {
+app.get('/order/:UserId', async (req: Request, res: Response) => {
     try {
-        const userId = req.params.userId;
+        const UserId = req.params.UserId;
 
-        const orders = await Order.findAll({ where: { userId } });
+        const orders = await Order.findAll({ where: { UserId } });
 
         res.json(orders);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.post('/users', async (req, res) => {
+    try {
+        const newUser = await User.create(req.body);
+        console.log('New user created:', newUser);
+        res.status(201).json(newUser);
+    } catch (error) {
+        console.error('Error occurred while processing POST request:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.get('/users', async (req, res) => {
+    try {
+        // Retrieve all users from the database
+        const users = await User.findAll();
+        // Respond with the list of users
+        res.json(users);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });

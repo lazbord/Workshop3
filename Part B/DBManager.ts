@@ -17,7 +17,7 @@ export class Product extends Model {
 }
 export class Order extends Model {
     declare id: number;
-    declare userId: number;
+    declare UserId: number;
     declare status: string;
     declare totalPrice:number;
     declare products: Array<{
@@ -32,7 +32,11 @@ export class Cart extends Model{
         quantity: number;
     }>;
     declare totalPrice:number;
-    declare userId:number;
+    declare UserId:number;
+}
+
+export class User extends Model {
+    declare UserId: number;
 }
 
 export function connectDb(): void {
@@ -77,7 +81,7 @@ export async function createTables() {
             autoIncrement: true,
             primaryKey: true,
         },
-        userId: {
+        UserId: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
@@ -98,7 +102,7 @@ export async function createTables() {
 
 
     Cart.init({
-        userId: {
+        UserId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             primaryKey: true,
@@ -121,7 +125,13 @@ export async function createTables() {
         },
     }, { sequelize, tableName: "Cart" });
 
-    // Extend the Cart model with an array of products
+    User.init({
+        UserId: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+        },
+    }, { sequelize, tableName: "User" });
 
     await Order.sync({ force: false });
     console.log("Order table created");
@@ -129,4 +139,7 @@ export async function createTables() {
     console.log("Cart table created");
     await Product.sync({force: false});
     console.log("Product table created");
+
+    await User.sync({force: false});
+    console.log("User table created");
 }

@@ -1,4 +1,6 @@
+<h1>Product Management</h1>
 <button (click)="getServerData()">Get Server Data</button>
+
 <div *ngIf="serverData">
   <div *ngFor="let product of serverData">
     <p>Product ID: {{product.id}}</p>
@@ -9,6 +11,9 @@
     <p>Stock Quantity: {{product.stock_quantity}}</p>
   </div>
 </div>
+
+<h2>Add Product</h2>
+
 <div>
   <input [(ngModel)]="productData.name" placeholder="Product Name">
   <input [(ngModel)]="productData.description" placeholder="Product Description">
@@ -17,6 +22,9 @@
   <input [(ngModel)]="productData.stock_quantity" placeholder="Stock Quantity" type="number">
   <button (click)="addProduct()">Add Product</button>
 </div>
+
+<h2>Update Product</h2>
+
 <div>
   <input [(ngModel)]="productIdToUpdate" placeholder="Product ID to Update" type="number">
   <input [(ngModel)]="productData.name" placeholder="Product Name">
@@ -25,4 +33,88 @@
   <input [(ngModel)]="productData.category" placeholder="Product Category">
   <input [(ngModel)]="productData.stock_quantity" placeholder="Stock Quantity" type="number">
   <button (click)="updateProduct()">Update Product</button>
+</div>
+
+<h2>Delete Product</h2>
+
+<div>
+  <input [(ngModel)]="productIdToUpdate" placeholder="Product ID to Delete" type="number">
+  <button (click)="deleteProduct()">Delete Product</button>
+</div>
+
+<h2>Users</h2>
+<button (click)="getUsers()">Get Users</button>
+
+<div *ngIf="usersData">
+  <div *ngFor="let user of usersData">
+    <p>User ID: {{user.UserId}}</p>
+  </div>
+</div>
+
+<h2>Add User</h2>
+
+<div>
+  <button (click)="addUser()">Add User</button>
+</div>
+
+<h1>Cart Management</h1>
+
+<h2>Cart</h2>
+<div *ngIf="cartData">
+  <div *ngFor="let item of cartData.products">
+    <p>Product ID: {{item.productId}}</p>
+    <p>Quantity: {{item.quantity}}</p>
+  </div>
+</div>
+
+<h2>Add to Cart</h2>
+
+<div>
+  <input [(ngModel)]="UserId" placeholder="User ID" type="number">
+  <input [(ngModel)]="productIdToUpdate" placeholder="Product ID to Add to Cart" type="number">
+  <button (click)="addToCart()">Add to Cart</button>
+</div>
+
+<h2>Get Cart</h2>
+
+<div>
+  <input [(ngModel)]="UserId" placeholder="User ID" type="number">
+  <button (click)="getCart()">Get Cart</button>
+</div>
+
+<h2>Remove from Cart</h2>
+
+<div>
+  <input [(ngModel)]="UserId" placeholder="User ID" type="number">
+  <input [(ngModel)]="productIdToUpdate" placeholder="Product ID to Remove from Cart" type="number">
+  <button (click)="removeFromCart()">Remove from Cart</button>
+</div>
+
+
+<h1>Order Management</h1>
+
+<h2>Orders</h2>
+<div *ngIf="ordersData">
+  <div *ngFor="let order of ordersData">
+    <p>Order ID: {{order.id}}</p>
+    <div *ngFor="let item of order.products">
+      <p>Product ID: {{item.product.id}}</p>
+      <p>Quantity: {{item.quantity}}</p>
+    </div>
+    <p>Total Price: {{order.totalPrice}}</p>
+  </div>
+</div>
+
+<h2>Create Order</h2>
+
+<div>
+  <input [(ngModel)]="UserId" placeholder="User ID" type="number">
+  <button (click)="createOrder()">Create Order</button>
+</div>
+
+<h2>Get Orders</h2>
+
+<div>
+  <input [(ngModel)]="UserId" placeholder="User ID" type="number">
+  <button (click)="getOrders()">Get Orders</button>
 </div>
