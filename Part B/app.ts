@@ -1,8 +1,13 @@
 // server.ts
 import * as express from 'express';
+import * as cors from 'cors';
 import {Request, Response} from 'express';
 import {Cart, connectDb, createTables, Order, Product} from './DBManager';
+
 const app = express();
+app.use(cors({
+    origin: 'http://localhost:4200'
+}));
 app.use(express.json());
 
 const port = 3001;

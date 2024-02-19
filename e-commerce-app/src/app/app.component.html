@@ -1,0 +1,28 @@
+<button (click)="getServerData()">Get Server Data</button>
+<div *ngIf="serverData">
+  <div *ngFor="let product of serverData">
+    <p>Product ID: {{product.id}}</p>
+    <p>Product Name: {{product.name}}</p>
+    <p>Product Description: {{product.description}}</p>
+    <p>Product Price: {{product.price}}</p>
+    <p>Product Category: {{product.category}}</p>
+    <p>Stock Quantity: {{product.stock_quantity}}</p>
+  </div>
+</div>
+<div>
+  <input [(ngModel)]="productData.name" placeholder="Product Name">
+  <input [(ngModel)]="productData.description" placeholder="Product Description">
+  <input [(ngModel)]="productData.price" placeholder="Product Price" type="number">
+  <input [(ngModel)]="productData.category" placeholder="Product Category">
+  <input [(ngModel)]="productData.stock_quantity" placeholder="Stock Quantity" type="number">
+  <button (click)="addProduct()">Add Product</button>
+</div>
+<div>
+  <input [(ngModel)]="productIdToUpdate" placeholder="Product ID to Update" type="number">
+  <input [(ngModel)]="productData.name" placeholder="Product Name">
+  <input [(ngModel)]="productData.description" placeholder="Product Description">
+  <input [(ngModel)]="productData.price" placeholder="Product Price" type="number">
+  <input [(ngModel)]="productData.category" placeholder="Product Category">
+  <input [(ngModel)]="productData.stock_quantity" placeholder="Stock Quantity" type="number">
+  <button (click)="updateProduct()">Update Product</button>
+</div>
